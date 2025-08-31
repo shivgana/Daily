@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gold Rates by Country</title>
+  <style>
+    table { border-collapse: collapse; width: 80%; margin: 20px auto; }
+    th, td { padding: 8px 12px; border: 1px solid #333; text-align: center; }
+    th { background: #555; color: #fff; }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center;">Gold Rates (24 K &amp; 22 K)</h1>
+  <table id="country-gold-table">
+    <thead>
+      <tr>
+        <th>Country</th>
+        <th>24 K Price (per g)</th>
+        <th>22 K Price (per g)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <table id="city-gold-table">
+    <thead>
+      <tr>
+        <th>Indian Cities</th>
+        <th>24 K Price (per g)</th>
+        <th>22 K Price (per g)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    // List of countries and their GoodReturns URL paths
+    const citiesInIndia = [
+        { path: "/gold-rates/agra.html", name: "Agra" },
+        { path: "/gold-rates/ahmedabad.html", name: "Ahmedabad" },
+        { path: "/gold-rates/alappuzha.html", name: "Alappuzha" },
+        { path: "/gold-rates/amaravati.html", name: "Amaravati" },
+        { path: "/gold-rates/ambur.html", name: "Ambur" },
+        { path: "/gold-rates/amravati.html", name: "Amravati" },
+        { path: "/gold-rates/amritsar.html", name: "Amritsar" },
+        { path: "/gold-rates/anantapur.html", name: "Anantapur" },
+        { path: "/gold-rates/arcot.html", name: "Arcot" },
+        { path: "/gold-rates/ariyalur.html", name: "Ariyalur" },
+        { path: "/gold-rates/aurangabad.html", name: "Aurangabad" },
+        { path: "/gold-rates/ayodhya.html", name: "Ayodhya" },
+        { path: "/gold-rates/bagalkot.html", name: "Bagalkot" },
+        { path: "/gold-rates/bangalore.html", name: "Bangalore" },
+        { path: "/gold-rates/belgaum.html", name: "Belgaum" },
+        { path: "/gold-rates/bellary.html", name: "Bellary" },
+        { path: "/gold-rates/berhampur.html", name: "Berhampur" },
+        { path: "/gold-rates/bhadravathi.html", name: "Bhadravathi" },
+        { path: "/gold-rates/bhiwandi.html", name: "Bhiwandi" },
+        { path: "/gold-rates/bhopal.html", name: "Bhopal" },
+        { path: "/gold-rates/bhubaneswar.html", name: "Bhubaneswar" },
+        { path: "/gold-rates/chandigarh.html", name: "Chandigarh" },
+        { path: "/gold-rates/chennai.html", name: "Chennai" },
+        { path: "/gold-rates/chitradurga.html", name: "Chitradurga" },
+        { path: "/gold-rates/coimbatore.html", name: "Coimbatore" },
+        { path: "/gold-rates/cuddalore.html", name: "Cuddalore" },
+        { path: "/gold-rates/cuttack.html", name: "Cuttack" },
+        { path: "/gold-rates/davanagere.html", name: "Davanagere" },
+        { path: "/gold-rates/delhi.html", name: "Delhi" },
+        { path: "/gold-rates/dharmapuri.html", name: "Dharmapuri" },
+        { path: "/gold-rates/dindigul.html", name: "Dindigul" },
+        { path: "/gold-rates/erode.html", name: "Erode" },
+        { path: "/gold-rates/gadag.html", name: "Gadag" },
+        { path: "/gold-rates/ghaziabad.html", name: "Ghaziabad" },
+        { path: "/gold-rates/goa.html", name: "Goa" },
+        { path: "/gold-rates/guntur.html", name: "Guntur" },
+        { path: "/gold-rates/gurgaon.html", name: "Gurgaon" },
+        { path: "/gold-rates/guwahati.html", name: "Guwahati" },
+        { path: "/gold-rates/hosur.html", name: "Hosur" },
+        { path: "/gold-rates/hyderabad.html", name: "Hyderabad" },
+        { path: "/gold-rates/indore.html", name: "Indore" },
+        { path: "/gold-rates/jaipur.html", name: "Jaipur" },
+        { path: "/gold-rates/jalgaon.html", name: "Jalgaon" },
+        { path: "/gold-rates/jayankondam.html", name: "Jayankondam" },
+        { path: "/gold-rates/kadapa.html", name: "Kadapa" },
+        { path: "/gold-rates/kakinada.html", name: "Kakinada" },
+        { path: "/gold-rates/kallakurichi.html", name: "Kallakurichi" },
+        { path: "/gold-rates/kanchipuram.html", name: "Kanchipuram" },
+        { path: "/gold-rates/kannur.html", name: "Kannur" },
+        { path: "/gold-rates/kanpur.html", name: "Kanpur" },
+        { path: "/gold-rates/kanyakumari.html", name: "Kanyakumari" },
+        { path: "/gold-rates/karaikudi.html", name: "Karaikudi" },
+        { path: "/gold-rates/karur.html", name: "Karur" },
+        { path: "/gold-rates/kerala.html", name: "Kerala" },
+        { path: "/gold-rates/khammam.html", name: "Khammam" },
+        { path: "/gold-rates/kochi.html", name: "Kochi" },
+        { path: "/gold-rates/kodaikanal.html", name: "Kodaikanal" },
+        { path: "/gold-rates/kolar.html", name: "Kolar" },
+        { path: "/gold-rates/kolhapur.html", name: "Kolhapur" },
+        { path: "/gold-rates/kolkata.html", name: "Kolkata" },
+        { path: "/gold-rates/kollam.html", name: "Kollam" },
+        { path: "/gold-rates/kottayam.html", name: "Kottayam" },
+        { path: "/gold-rates/kovilpatti.html", name: "Kovilpatti" },
+        { path: "/gold-rates/kozhikode.html", name: "Kozhikode" },
+        { path: "/gold-rates/krishnagiri.html", name: "Krishnagiri" },
+        { path: "/gold-rates/kumbakonam.html", name: "Kumbakonam" },
+        { path: "/gold-rates/latur.html", name: "Latur" },
+        { path: "/gold-rates/lucknow.html", name: "Lucknow" },
+        { path: "/gold-rates/ludhiana.html", name: "Ludhiana" },
+        { path: "/gold-rates/madurai.html", name: "Madurai" },
+        { path: "/gold-rates/malappuram.html", name: "Malappuram" },
+        { path: "/gold-rates/mandya.html", name: "Mandya" },
+        { path: "/gold-rates/mangalore.html", name: "Mangalore" },
+        { path: "/gold-rates/meerut.html", name: "Meerut" },
+        { path: "/gold-rates/mohali.html", name: "Mohali" },
+        { path: "/gold-rates/mumbai.html", name: "Mumbai" },
+        { path: "/gold-rates/mysore.html", name: "Mysore" },
+        { path: "/gold-rates/nagapattinam.html", name: "Nagapattinam" },
+        { path: "/gold-rates/nagercoil.html", name: "Nagercoil" },
+        { path: "/gold-rates/nagpur.html", name: "Nagpur" },
+        { path: "/gold-rates/namakkal.html", name: "Namakkal" },
+        { path: "/gold-rates/nashik.html", name: "Nashik" },
+        { path: "/gold-rates/nellore.html", name: "Nellore" },
+        { path: "/gold-rates/nizamabad.html", name: "Nizamabad" },
+        { path: "/gold-rates/noida.html", name: "Noida" },
+        { path: "/gold-rates/ooty.html", name: "Ooty" },
+        { path: "/gold-rates/palakkad.html", name: "Palakkad" },
+        { path: "/gold-rates/palani.html", name: "Palani" },
+        { path: "/gold-rates/paramakudi.html", name: "Paramakudi" },
+        { path: "/gold-rates/patna.html", name: "Patna" },
+        { path: "/gold-rates/perambalur.html", name: "Perambalur" },
+        { path: "/gold-rates/pollachi.html", name: "Pollachi" },
+        { path: "/gold-rates/pondicherry.html", name: "Pondicherry" },
+        { path: "/gold-rates/pudukkottai.html", name: "Pudukkottai" },
+        { path: "/gold-rates/pune.html", name: "Pune" },
+        { path: "/gold-rates/raipur.html", name: "Raipur" },
+        { path: "/gold-rates/rajahmundry.html", name: "Rajahmundry" },
+        { path: "/gold-rates/rajkot.html", name: "Rajkot" },
+        { path: "/gold-rates/ramanathapuram.html", name: "Ramanathapuram" },
+        { path: "/gold-rates/rameswaram.html", name: "Rameswaram" },
+        { path: "/gold-rates/rourkela.html", name: "Rourkela" },
+        { path: "/gold-rates/salem.html", name: "Salem" },
+        { path: "/gold-rates/sambalpur.html", name: "Sambalpur" },
+        { path: "/gold-rates/sivagangai.html", name: "Sivagangai" },
+        { path: "/gold-rates/solapur.html", name: "Solapur" },
+        { path: "/gold-rates/surat.html", name: "Surat" },
+        { path: "/gold-rates/thane.html", name: "Thane" },
+        { path: "/gold-rates/thanjavur.html", name: "Thanjavur" },
+        { path: "/gold-rates/theni.html", name: "Theni" },
+        { path: "/gold-rates/thrissur.html", name: "Thrissur" },
+        { path: "/gold-rates/tirunelveli.html", name: "Tirunelveli" },
+        { path: "/gold-rates/tirupati.html", name: "Tirupati" },
+        { path: "/gold-rates/tirupur.html", name: "Tirupur" },
+        { path: "/gold-rates/tiruvannamalai.html", name: "Tiruvannamalai" },
+        { path: "/gold-rates/tiruvarur.html", name: "Tiruvarur" },
+        { path: "/gold-rates/trichy.html", name: "Trichy" },
+        { path: "/gold-rates/trivandrum.html", name: "Trivandrum" },
+        { path: "/gold-rates/tumkur.html", name: "Tumkur" },
+        { path: "/gold-rates/tuticorin.html", name: "Tuticorin" },
+        { path: "/gold-rates/vadodara.html", name: "Vadodara" },
+        { path: "/gold-rates/varanasi.html", name: "Varanasi" },
+        { path: "/gold-rates/vasai-virar.html", name: "Vasai-Virar" },
+        { path: "/gold-rates/vellore.html", name: "Vellore" },
+        { path: "/gold-rates/vijayawada.html", name: "Vijayawada" },
+        { path: "/gold-rates/villupuram.html", name: "Villupuram" },
+        { path: "/gold-rates/virudhunagar.html", name: "Virudhunagar" },
+        { path: "/gold-rates/visakhapatnam.html", name: "Visakhapatnam" },
+        { path: "/gold-rates/warangal.html", name: "Warangal" },
+    ];
+    const countries = [
+        { path: "/gold-rates/abu-dhabi.html", name: "Abu Dhabi"},
+        { path: "/gold-rates/ajman.html", name: "Ajman"},
+        { path: "/gold-rates/australia.html", name: "Australia"},
+        { path: "/gold-rates/bahrain.html", name: "Bahrain"},
+        { path: "/gold-rates/bangladesh.html", name: "Bangladesh"},
+        { path: "/gold-rates/canada.html", name: "Canada"},
+        { path: "/gold-rates/china.html", name: "China"},
+        { path: "/gold-rates/dammam.html", name: "Dammam"},
+        { path: "/gold-rates/doha.html", name: "Doha"},
+        { path: "/gold-rates/dubai.html", name: "Dubai"},
+        { path: "/gold-rates/england.html", name: "England"},
+        { path: "/gold-rates/France.html", name: "France"},
+        { path: "/gold-rates/fujairah.html", name: "Fujairah"},
+        { path: "/gold-rates/germany.html", name: "Germany"},
+        { path: "/gold-rates/japan.html", name: "Japan"},
+        { path: "/gold-rates/kuwait.html", name: "Kuwait"},
+        { path: "/gold-rates/malaysia.html", name: "Malaysia"},
+        { path: "/gold-rates/muscat.html", name: "Muscat"},
+        { path: "/gold-rates/nepal.html", name: "Nepal"},
+        { path: "/gold-rates/new-zealand.html", name: "New Zealand"},
+        { path: "/gold-rates/oman.html", name: "Oman"},
+        { path: "/gold-rates/pakistan.html", name: "Pakistan"},
+        { path: "/gold-rates/qatar.html", name: "Qatar"},
+        { path: "/gold-rates/ras-al-khaimah.html", name: "Ras al Khaimah"},
+        { path: "/gold-rates/russia.html", name: "Russia"},
+        { path: "/gold-rates/saudi-arabia.html", name: "Saudi Arabia"},
+        { path: "/gold-rates/sharjah.html", name: "Sharjah"},
+        { path: "/gold-rates/singapore.html", name: "Singapore"},
+        { path: "/gold-rates/sri-Lanka.html", name: "Sri Lanka"},
+        { path: "/gold-rates/united-arab-emirates.html", name: "United Arab Emirates"},
+        { path: "/gold-rates/united-states.html", name: "United States"}      
+    ];
+
+    const countryTableBody = document.querySelector('#country-gold-table tbody');
+    const cityTableBody = document.querySelector('#city-gold-table tbody');
+
+    async function fetchAndParse(country, tableBody) {
+      try {
+        const parser = new DOMParser();
+        const url = 'https://www.goodreturns.in' + country.path;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const html = await response.text();
+        const htmlcontent = parser.parseFromString(html, 'text/html');
+        const parent24 = htmlcontent.getElementById("24K-price");
+        const price24 = parent24.innerText.trim();
+        const parent22 = htmlcontent.getElementById("22K-price");
+        const price22 = parent22.innerText.trim();
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><a href=${url}>${country.name}</a></td>
+          <td>${price24}</td>
+          <td>${price22}</td>
+        `;
+        tableBody.appendChild(row);
+      } catch (err) {
+        console.error(`Error fetching ${country.name}:`, err);
+      }
+    }
+
+    countries.forEach(co => fetchAndParse(co, countryTableBody));
+    citiesInIndia.forEach(ci => fetchAndParse(ci, cityTableBody));
+  </script>
+</body>
+</html>
