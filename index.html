@@ -200,69 +200,69 @@
     ];
 
     const countryTableBody = document.querySelector('#country-gold-table tbody');
-const cityTableBody = document.querySelector('#city-gold-table tbody');
-
-async function fetchGoldRate(country) {
-  try {
-    const parser = new DOMParser();
-    const url = 'https://www.goodreturns.in' + country.path;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    const cityTableBody = document.querySelector('#city-gold-table tbody');
+    
+    async function fetchGoldRate(country) {
+      try {
+        const parser = new DOMParser();
+        const url = 'https://www.goodreturns.in' + country.path;
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const html = await response.text();
+        const htmlcontent = parser.parseFromString(html, 'text/html');
+    
+        // Extract 24K & 22K prices
+        const parent24 = htmlcontent.getElementById("24K-price");
+        const price24 = parent24 ? parent24.innerText.trim() : 'N/A';
+    
+        const parent22 = htmlcontent.getElementById("22K-price");
+        const price22 = parent22 ? parent22.innerText.trim() : 'N/A';
+    
+        return {
+          name: country.name,
+          url,
+          price24,
+          price22
+        };
+      } catch (err) {
+        console.error(`Error fetching ${country.name}:`, err);
+        return {
+          name: country.name,
+          url: 'N/A',
+          price24: 'N/A',
+          price22: 'N/A'
+        };
+      }
     }
-    const html = await response.text();
-    const htmlcontent = parser.parseFromString(html, 'text/html');
-
-    // Extract 24K & 22K prices
-    const parent24 = htmlcontent.getElementById("24K-price");
-    const price24 = parent24 ? parent24.innerText.trim() : 'N/A';
-
-    const parent22 = htmlcontent.getElementById("22K-price");
-    const price22 = parent22 ? parent22.innerText.trim() : 'N/A';
-
-    return {
-      name: country.name,
-      url,
-      price24,
-      price22
-    };
-  } catch (err) {
-    console.error(`Error fetching ${country.name}:`, err);
-    return {
-      name: country.name,
-      url: 'N/A',
-      price24: 'N/A',
-      price22: 'N/A'
-    };
-  }
-}
-
-// Function to render table after all data is collected
-function renderTable(dataArray, tableBody) {
-  const rowsHTML = dataArray.map(item => `
-    <tr>
-      <td><a href="${item.url}">${item.name}</a></td>
-      <td>${item.price24}</td>
-      <td>${item.price22}</td>
-    </tr>
-  `).join('');
-  tableBody.innerHTML = rowsHTML;
-}
-
-// Fetch all countries & cities concurrently and render tables
-async function loadGoldRates() {
-  const countryPromises = countries.map(co => fetchGoldRate(co));
-  const cityPromises = citiesInIndia.map(ci => fetchGoldRate(ci));
-
-  const countryData = await Promise.all(countryPromises);
-  const cityData = await Promise.all(cityPromises);
-
-  renderTable(countryData, countryTableBody);
-  renderTable(cityData, cityTableBody);
-}
-
-// Start fetching
-loadGoldRates();
+    
+    // Function to render table after all data is collected
+    function renderTable(dataArray, tableBody) {
+      const rowsHTML = dataArray.map(item => `
+        <tr>
+          <td><a href="${item.url}">${item.name}</a></td>
+          <td>${item.price24}</td>
+          <td>${item.price22}</td>
+        </tr>
+      `).join('');
+      tableBody.innerHTML = rowsHTML;
+    }
+    
+    // Fetch all countries & cities concurrently and render tables
+    async function loadGoldRates() {
+      const countryPromises = countries.map(co => fetchGoldRate(co));
+      const cityPromises = citiesInIndia.map(ci => fetchGoldRate(ci));
+    
+      const countryData = await Promise.all(countryPromises);
+      const cityData = await Promise.all(cityPromises);
+    
+      renderTable(countryData, countryTableBody);
+      renderTable(cityData, cityTableBody);
+    }
+    
+    // Start fetching
+    loadGoldRates();
   </script>
 </body>
 </html>
