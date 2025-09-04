@@ -166,43 +166,66 @@
         { path: "/gold-rates/warangal.html", name: "Warangal" },
     ];
     const countries = [
-        { path: "/gold-rates/abu-dhabi.html", name: "Abu Dhabi"},
-        { path: "/gold-rates/ajman.html", name: "Ajman"},
-        { path: "/gold-rates/australia.html", name: "Australia"},
-        { path: "/gold-rates/bahrain.html", name: "Bahrain"},
-        { path: "/gold-rates/bangladesh.html", name: "Bangladesh"},
-        { path: "/gold-rates/canada.html", name: "Canada"},
-        { path: "/gold-rates/china.html", name: "China"},
-        { path: "/gold-rates/dammam.html", name: "Dammam"},
-        { path: "/gold-rates/doha.html", name: "Doha"},
-        { path: "/gold-rates/dubai.html", name: "Dubai"},
-        { path: "/gold-rates/england.html", name: "England"},
-        { path: "/gold-rates/France.html", name: "France"},
-        { path: "/gold-rates/fujairah.html", name: "Fujairah"},
-        { path: "/gold-rates/germany.html", name: "Germany"},
-        { path: "/gold-rates/japan.html", name: "Japan"},
-        { path: "/gold-rates/kuwait.html", name: "Kuwait"},
-        { path: "/gold-rates/malaysia.html", name: "Malaysia"},
-        { path: "/gold-rates/muscat.html", name: "Muscat"},
-        { path: "/gold-rates/nepal.html", name: "Nepal"},
-        { path: "/gold-rates/new-zealand.html", name: "New Zealand"},
-        { path: "/gold-rates/oman.html", name: "Oman"},
-        { path: "/gold-rates/pakistan.html", name: "Pakistan"},
-        { path: "/gold-rates/qatar.html", name: "Qatar"},
-        { path: "/gold-rates/ras-al-khaimah.html", name: "Ras al Khaimah"},
-        { path: "/gold-rates/russia.html", name: "Russia"},
-        { path: "/gold-rates/saudi-arabia.html", name: "Saudi Arabia"},
-        { path: "/gold-rates/sharjah.html", name: "Sharjah"},
-        { path: "/gold-rates/singapore.html", name: "Singapore"},
-        { path: "/gold-rates/sri-Lanka.html", name: "Sri Lanka"},
-        { path: "/gold-rates/united-arab-emirates.html", name: "United Arab Emirates"},
-        { path: "/gold-rates/united-states.html", name: "United States"}      
+      { currency: "AED", path: "/gold-rates/abu-dhabi.html", name: "Abu Dhabi"},
+      { currency: "AED", path: "/gold-rates/ajman.html", name: "Ajman"},
+      { currency: "AUD", path: "/gold-rates/australia.html", name: "Australia"},
+      { currency: "BHD", path: "/gold-rates/bahrain.html", name: "Bahrain"},
+      { currency: "BDT", path: "/gold-rates/bangladesh.html", name: "Bangladesh"},
+      { currency: "CAD", path: "/gold-rates/canada.html", name: "Canada"},
+      { currency: "CNY", path: "/gold-rates/china.html", name: "China"},
+      { currency: "SAR", path: "/gold-rates/dammam.html", name: "Dammam"},
+      { currency: "QAR", path: "/gold-rates/doha.html", name: "Doha"},
+      { currency: "AED", path: "/gold-rates/dubai.html", name: "Dubai"},
+      { currency: "GBP", path: "/gold-rates/england.html", name: "England"},
+      { currency: "EUR", path: "/gold-rates/France.html", name: "France"},
+      { currency: "AED", path: "/gold-rates/fujairah.html", name: "Fujairah"},
+      { currency: "EUR", path: "/gold-rates/germany.html", name: "Germany"},
+      { currency: "JPY", path: "/gold-rates/japan.html", name: "Japan"},
+      { currency: "KWD", path: "/gold-rates/kuwait.html", name: "Kuwait"},
+      { currency: "MYR", path: "/gold-rates/malaysia.html", name: "Malaysia"},
+      { currency: "OMR", path: "/gold-rates/muscat.html", name: "Muscat"},
+      { currency: "NPR", path: "/gold-rates/nepal.html", name: "Nepal"},
+      { currency: "NZD", path: "/gold-rates/new-zealand.html", name: "New Zealand"},
+      { currency: "OMR", path: "/gold-rates/oman.html", name: "Oman"},
+      { currency: "PKR", path: "/gold-rates/pakistan.html", name: "Pakistan"},
+      { currency: "QAR", path: "/gold-rates/qatar.html", name: "Qatar"},
+      { currency: "AED", path: "/gold-rates/ras-al-khaimah.html", name: "Ras al Khaimah"},
+      { currency: "RUB", path: "/gold-rates/russia.html", name: "Russia"},
+      { currency: "SAR", path: "/gold-rates/saudi-arabia.html", name: "Saudi Arabia"},
+      { currency: "AED", path: "/gold-rates/sharjah.html", name: "Sharjah"},
+      { currency: "SGD", path: "/gold-rates/singapore.html", name: "Singapore"},
+      { currency: "LKR", path: "/gold-rates/sri-Lanka.html", name: "Sri Lanka"},
+      { currency: "AED", path: "/gold-rates/united-arab-emirates.html", name: "United Arab Emirates"},
+      { currency: "USD", path: "/gold-rates/united-states.html", name: "United States"}
     ];
 
     const countryTableBody = document.querySelector('#country-gold-table tbody');
     const cityTableBody = document.querySelector('#city-gold-table tbody');
     
+    async function convertCurrencytoINR(country,amount) {
+      let value;  
+      try {
+            const url = 'https://api.exchangerate-api.com/v4/latest/'+country;
+            const parser = new DOMParser();
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            const inrRate = data.rates.INR;
+            value = inrRate*parseFloat(amount.replace(/,/g, ''));
+            console.log(parseFloat(amount.replace(/,/g, '')));
+        } catch (err) {
+            console.error(`Error fetching ${country}:`, err);
+        }
+        return parseInt(value);
+    }
+
+
     async function fetchGoldRate(country) {
+      // Declare outside
+      let currencytoINRValue24 = null;
+      let currencytoINRValue22 = null;
       try {
         const parser = new DOMParser();
         const url = 'https://www.goodreturns.in' + country.path;
@@ -216,16 +239,27 @@
         // Extract 24K & 22K prices
         const parent24 = htmlcontent.getElementById("24K-price");
         const price24 = parent24 ? parent24.innerText.trim() : 'N/A';
-    
+
         const parent22 = htmlcontent.getElementById("22K-price");
         const price22 = parent22 ? parent22.innerText.trim() : 'N/A';
-    
-        return {
+
+        if ("currency" in country){
+          currencytoINRValue24 = await convertCurrencytoINR(country.currency, parent24.childNodes[parent24.childNodes.length - 1].textContent.trim());
+          currencytoINRValue22 = await convertCurrencytoINR(country.currency, parent22.childNodes[parent22.childNodes.length - 1].textContent.trim());
+        }
+        
+        result = {
           name: country.name,
           url,
           price24,
-          price22
+          price22,
+          ...(currencytoINRValue24 && { currencytoINRValue24 }),
+          ...(currencytoINRValue22 && { currencytoINRValue22 })
         };
+
+        // console.log(result,currencytoINRValue22,currencytoINRValue24);
+
+        return result;
       } catch (err) {
         console.error(`Error fetching ${country.name}:`, err);
         return {
@@ -242,8 +276,8 @@
       const rowsHTML = dataArray.map(item => `
         <tr>
           <td><a href="${item.url}">${item.name}</a></td>
-          <td>${item.price24}</td>
-          <td>${item.price22}</td>
+          <td>${item.price24} (<b>INR: ${item.currencytoINRValue24 ? item.currencytoINRValue24 : "" }</b>)</td>
+          <td>${item.price22} (<b>INR: ${item.currencytoINRValue22 ? item.currencytoINRValue22 : "" }</b>)</td>
         </tr>
       `).join('');
       tableBody.innerHTML = rowsHTML;
@@ -256,7 +290,8 @@
     
       const countryData = await Promise.all(countryPromises);
       const cityData = await Promise.all(cityPromises);
-    
+      countryData.sort((a, b) => a.currencytoINRValue24 - b.currencytoINRValue24);
+
       renderTable(countryData, countryTableBody);
       renderTable(cityData, cityTableBody);
     }
