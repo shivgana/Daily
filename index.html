@@ -275,8 +275,8 @@
       const rowsHTML = dataArray.map(item => `
         <tr>
           <td><a href="${item.url}">${item.name}</a></td>
-          <td>${item.price24} (<b>INR: ${item.currencytoINRValue24 ? item.currencytoINRValue24 : "" }</b>)</td>
-          <td>${item.price22} (<b>INR: ${item.currencytoINRValue22 ? item.currencytoINRValue22 : "" }</b>)</td>
+          <td>${item.price24} ${item.currencytoINRValue24 ? "(<b>INR: "+item.currencytoINRValue24+"</b>)" : "" }</td>
+          <td>${item.price22} ${item.currencytoINRValue22 ? "(<b>INR: "+item.currencytoINRValue22+"</b>)" : "" }</td>
         </tr>
       `).join('');
       tableBody.innerHTML = rowsHTML;
@@ -290,7 +290,7 @@
       const countryData = await Promise.all(countryPromises);
       const cityData = await Promise.all(cityPromises);
       countryData.sort((a, b) => a.currencytoINRValue24 - b.currencytoINRValue24);
-
+      cityData.sort((a, b) => a.price24 - b.price24);
       renderTable(countryData, countryTableBody);
       renderTable(cityData, cityTableBody);
     }
